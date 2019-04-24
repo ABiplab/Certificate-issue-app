@@ -1,0 +1,98 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.library
+participant College identified by collegeregId {
+  o String collegeregId
+  o String name  regex= /[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/
+    o String address
+  o String mobile  regex= /^[0][1-9]\d{9}$|^[1-9]\d{9}$/
+  o String email regex=  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+o String course
+o String university
+ 
+}
+participant Student identified by studentregId {
+  o String studentregId
+   o String name 
+    o String address
+  o String mobile  regex= /^[0][1-9]\d{9}$|^[1-9]\d{9}$/
+  o String email  regex=  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  o String college
+  o String course
+  o Long balance
+}
+participant University identified by universityregId {
+  o String universityregId
+  o String name 
+}
+
+enum CertificateStatus {
+  o AVAILABLE
+  o CLGBORROWED
+  o LOST
+  o STDBORROWED
+}
+
+asset Certificate identified by serialNo {
+  o String serialNo
+  o String certificatename 
+  o String university
+  o String studentId
+  o CertificateStatus status 
+  o Long originalPrice
+
+
+  --> College  borrower optional
+    o DateTime borrowedTime optional
+  --> Student borrower2 optional
+ o DateTime borrowed2Time optional
+}
+abstract transaction CertificateTransaction {
+-->Certificate certificate
+}
+ transaction Borrow extends CertificateTransaction {
+
+--> College college
+
+
+}
+transaction Borrow2 extends CertificateTransaction {
+
+--> Student student
+
+
+}
+transaction Return extends CertificateTransaction {
+
+}
+transaction Lost extends CertificateTransaction {
+
+}
+transaction Payment {
+  --> Student student
+  o Long amount
+}
+transaction AddDemo {
+ 
+}
+event CollegeNotification {
+--> Student student
+--> Certificate certificate
+o String message
+}
